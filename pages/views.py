@@ -1,9 +1,11 @@
-from django import forms
+from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponse, HttpResponseRedirect
+from django.urls import reverse
 from django.views.generic import TemplateView, ListView
 from django.views import View
-from django.contrib import messages
+from django import forms
+from pydantic import ValidationError
+from pages.utils import ImageLocalStorage
 from .models import Product
 
 # Create your views here. 
@@ -167,3 +169,18 @@ class CartRemoveAllView(View):
         if 'cart_product_data' in request.session:
             del request.session['cart_product_data']
         return redirect('cart_index')
+    
+def ImageViewFactory(image_storage):
+    class ImageView(View):
+        template_name = 'images/index.html'
+
+        def get(self, request):
+            image_url = request.session.get('image_url', '')
+            return render(request, self.template_name, {'image_url': image_url})
+
+        def post(self, request):
+            image_url = image_storage.store(request)
+            request.session['image_url'] = image_url
+            return redirect('image_index')
+
+    return ImageView
