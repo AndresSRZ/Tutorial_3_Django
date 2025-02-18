@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
@@ -49,7 +50,6 @@ class ProductShowView(View):
     template_name = 'products/show.html'
 
     def get(self, request, id):
-        # ✅ Fetch product directly from the database
         product = get_object_or_404(Product, pk=id)  
 
         viewData = {
